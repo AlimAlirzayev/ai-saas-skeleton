@@ -3,6 +3,7 @@ volumes:
   postgres_storage:
   ollama_storage:
   qdrant_storage:
+  redis_storage:
 
 networks:
   demo:
@@ -64,7 +65,33 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+  redis:
+    image: redis:7-alpine
+    hostname: redis
+    container_name: redis
+    networks: ['demo']
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_storage:/data
 
+  api:
+    build: ./backend
+    hostname: api
+    container_name: api
+    networks: ['demo']
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+    env_file:
+      - path: .env
+        required: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
   n8n-import:
     <<: *service-n8n
     hostname: n8n-import
