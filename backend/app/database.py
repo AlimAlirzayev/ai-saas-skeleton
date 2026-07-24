@@ -4,11 +4,15 @@ from .config import settings
 
 DATABASE_URL = (
     f"postgresql+asyncpg://{settings.postgres_user}:"
-    f"{settings.postgres_password}@postgres/"
+    f"{settings.postgres_password}@postgres:5432/"
     f"{settings.postgres_db}"
 )
 
-engine = create_async_engine(DATABASE_URL, echo=False)
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=False,
+    connect_args={"ssl": False}  # ← BU ƏLAVƏ OLUNDU
+)
 
 AsyncSessionLocal = sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False
