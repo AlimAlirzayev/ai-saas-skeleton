@@ -1,4 +1,4 @@
-name: Deploy to Droplet
+﻿name: Deploy to Hetzner
 
 on:
   push:
@@ -11,14 +11,13 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.DROPLET_HOST }}
-          username: ${{ secrets.DROPLET_USER }}
-          key: ${{ secrets.DROPLET_SSH_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
-            set -e 
-            APP_DIR="/root/teche-ai-deployment"
-            REPO_URL="https://github.com/eljanabdullazada/teche-ai-deployment.git"
+            set -e
+            APP_DIR="/opt/ai-saas-skeleton"
+            REPO_URL="https://github.com/AlimAlirzayev/ai-saas-skeleton.git"
             
             if [ ! -d "$APP_DIR/.git" ]; then
               git clone "$REPO_URL" "$APP_DIR"
@@ -29,10 +28,9 @@ jobs:
             git reset --hard origin/main
             
             if [ ! -f .env ]; then
-              echo "ERROR: .env tapilmadi. Once serverde '$APP_DIR/.env' yaradin." >&2
+              echo "ERROR: .env tapilmadi!" >&2
               exit 1
             fi
             
-            docker compose pull
             docker compose up -d --build --remove-orphans
             docker image prune -f
