@@ -181,3 +181,19 @@ services:
     image: ollama/ollama:rocm
     depends_on:
      - ollama-gpu-amd
+  hr-agent:
+    build: ./hr-agent
+    hostname: hr-agent
+    container_name: hr-agent
+    networks: [ 'demo' ]
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    env_file:
+      - path: .env
+        required: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
