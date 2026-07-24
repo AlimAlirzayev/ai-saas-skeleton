@@ -1,17 +1,21 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.engine import URL
 from .config import settings
 
-DATABASE_URL = (
-    f"postgresql+asyncpg://{settings.postgres_user}:"
-    f"{settings.postgres_password}@postgres:5432/"
-    f"{settings.postgres_db}"
+connection_url = URL.create(
+    drivername="postgresql+asyncpg",
+    username=settings.postgres_user,
+    password=settings.postgres_password,
+    host="postgres",
+    port=5432,
+    database=settings.postgres_db,
 )
 
 engine = create_async_engine(
-    DATABASE_URL,
+    connection_url,
     echo=False,
-    connect_args={"ssl": False}  # ← BU ƏLAVƏ OLUNDU
+    connect_args={"ssl": False}
 )
 
 AsyncSessionLocal = sessionmaker(
